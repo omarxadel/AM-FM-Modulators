@@ -67,19 +67,20 @@ title('DSBTC modulated signal in frequency domain');
 
 % 1.6.Envelope detector demodulation.
 snr_SC=0;
+snr=0;
  if snr_SC == 1
-        DSBSC_t = awgn(DSBSC_t, snr_SC);
+        DSBSC_t = awgn(DSBSC_t, snr);
  end
     envelope_sc=abs(hilbert(DSBSC_t));
-    DSBSC_t_demod = resample(envelope_sc,resampleFrequency,Fs); %envelope detector and resample 
+    DSBSC_t_demod = resample(envelope_sc,Fs,resampleFrequency); %envelope detector and resample 
     DSBSC_f_demod = fftshift(fft(DSBSC_t_demod));
       
 snr_TC=0;
  if snr_TC == 1
-        DSBTC_t = awgn(DSBTC_t, snr_TC);
+        DSBTC_t = awgn(DSBTC_t, snr);
  end
     envelope_tc=abs(hilbert(DSBTC_t));
-    DSBTC_t_demod = resample(envelope_tc,resampleFrequency,Fs); %envelope detector and resample 
+    DSBTC_t_demod = resample(envelope_tc,Fs,resampleFrequency); %envelope detector and resample 
     DSBTC_f_demod = fftshift(fft(DSBTC_t_demod));
 
 % 1.7.Sketching and playing the recieved signal.
