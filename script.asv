@@ -55,7 +55,7 @@ plot(f_DSBSC,abs(DSBSC_f));
 title('DSBSC modulated signal in frequency domain');
     
 signalMax= max(abs(resampledSignal));
-A = 2*signalMax; %because modulation index =0.5
+A = 2*signalMax;%because modulat
 
 DSBTC_t = (A+resampledSignal).*carrier_t;
 DSBTC_f = fftshift(fft(DSBTC_t));
