@@ -4,54 +4,54 @@
 [signal,Fs] = audioread('eric.wav'); 
 
 FrequencyDomainSignal = fftshift(fft(signal));
-f=linspace(-Fs/2,Fs/2,length(FrequencyDomainSignal));
+f = linspace(-Fs/2,Fs/2,length(FrequencyDomainSignal));
 figure(1);
-plot(f,abs(FrequencyDomainSignal))
-title('Spectrum of the signal')
+plot(f, abs(FrequencyDomainSignal))
+title('Spectrum of the input signal')
 
 % 1.2.Filtering frequencies > 4KHz.
-BW=4000;
- filter = ones(length(FrequencyDomainSignal),1);
+BW = 4000;
+filter = ones(length(FrequencyDomainSignal), 1);
    
-    for i = 1: length(FrequencyDomainSignal)
+    for i = 1:length(FrequencyDomainSignal)
         if f(i)<-BW || f(i)>BW
-            filter(i)=0;
+            filter(i) = 0;
         end
     end
     
 FilteredSignal_f = filter.*FrequencyDomainSignal;
 
-figure();
-f_filtered=linspace(-Fs/2,Fs/2,length(real(FilteredSignal_f)));
-plot(f_filtered,abs(FilteredSignal_f));
-title('filtered signal in frequency doain');
+figure(2);
+f_filtered = linspace(-Fs/2,Fs/2,length(real(FilteredSignal_f)));
+plot(f_filtered, abs(FilteredSignal_f));
+title('Filtered signal in frequency domain');
 
 % 1.3.Filtered signal in time domain.
-FilteredSignal_t= real(ifft(ifftshift(FilteredSignal_f)));
+FilteredSignal_t = real(ifft(ifftshift(FilteredSignal_f)));
 
-figure();
+figure(3);
 t = linspace(0,length(FilteredSignal_t)/Fs, length(FilteredSignal_t));
-plot(t,real(FilteredSignal_t));
-title('filtered signal in time doain');
+plot(t, real(FilteredSignal_t));
+title('Filtered signal in time domain');
 
 % 1.4.Playing the filtered audio signal (sound).
-sound(FilteredSignal_t,Fs);
+sound(FilteredSignal_t, Fs);
 
 % 1.5.Modulating the signal.
-Fc=100000;
-resampleFrequency=5*Fc;
-resampledSignal=resample(FilteredSignal_t,resampleFrequency,Fs);
+Fc = 100000;
+resampleFrequency = 5*Fc;
+resampledSignal = resample(FilteredSignal_t, resampleFrequency,Fs);
 
-carrierTime = linspace(0,length(resampledSignal)/resampleFrequency, length(resampledSignal));
+carrierTime = linspace(0, length(resampledSignal)/resampleFrequency, length(resampledSignal));
 carrier_t = cos(2*pi*Fc*carrierTime).';
 carrier_f = fftshift(fft(carrier_t));
 
 DSBSC_t = carrier_t.*resampledSignal;
 DSBSC_f = fftshift(fft(DSBSC_t));
 
-figure();
+figure(4);
 f_DSBSC=linspace(-resampleFrequency/2,resampleFrequency/2,length(real(DSBSC_f)));
-plot(f_DSBSC,abs(DSBSC_f));
+plot(f_DSBSC, abs(DSBSC_f));
 title('DSBSC modulated signal in frequency domain');
     
 signalMax= max(abs(resampledSignal));
@@ -60,47 +60,47 @@ A = 2*signalMax; %because modulation index =0.5
 DSBTC_t = (A+resampledSignal).*carrier_t;
 DSBTC_f = fftshift(fft(DSBTC_t));
 
-figure();
-f_DSBTC=linspace(-resampleFrequency/2,resampleFrequency/2,length(real(DSBTC_f)));
-plot(f_DSBTC,abs(DSBTC_f));
+figure(5);
+f_DSBTC = linspace(-resampleFrequency/2,resampleFrequency/2,length(real(DSBTC_f)));
+plot(f_DSBTC, abs(DSBTC_f));
 title('DSBTC modulated signal in frequency domain');
 
 % 1.6.Envelope detector demodulation.
-snr_SC=0;
-snr=0;
+snr_SC = 0;
+snr = 0;
  if snr_SC == 1
         DSBSC_t = awgn(DSBSC_t, snr);
  end
-    envelope_sc=abs(hilbert(DSBSC_t));
+    envelope_sc = abs(hilbert(DSBSC_t));
     DSBSC_t_demod = resample(envelope_sc,Fs,resampleFrequency); %envelope detector and resample 
     DSBSC_f_demod = fftshift(fft(DSBSC_t_demod));
       
-snr_TC=0;
+snr_TC = 0;
  if snr_TC == 1
         DSBTC_t = awgn(DSBTC_t, snr);
  end
-    envelope_tc=abs(hilbert(DSBTC_t));
+    envelope_tc = abs(hilbert(DSBTC_t));
     DSBTC_t_demod = resample(envelope_tc,Fs,resampleFrequency); %envelope detector and resample 
     DSBTC_f_demod = fftshift(fft(DSBTC_t_demod));
 
 % 1.7.Sketching and playing the recieved signal.
-figure();
+figure(6);
 t_mod = linspace(0,length(DSBSC_t_demod)/Fs, length(DSBSC_t_demod));
-plot(t_mod,real(DSBSC_t_demod));
+plot(t_mod, real(DSBSC_t_demod));
 title('DSBSC demodulated signal in time domain using envelope detector');
 
-figure();
+figure(7);
 f_DSBSC_mod=linspace(-Fs/2,Fs/2,length(real(DSBSC_f_demod)));
 plot(f_DSBSC_mod,abs(DSBSC_f_demod));
 title('DSBSC demodulated signal in frequency domain using envelope detector');
 %sound(DSBSC_t_demod,Fs);
 
-figure();
+figure(8);
 t_modTc = linspace(0,length(DSBTC_t_demod)/Fs, length(DSBTC_t_demod));
 plot(t_modTc,real(DSBTC_t_demod));
 title('DSBTC demodulated signal in time domain using envelope detector');
 
-figure();
+figure(9);
 f_DSBTC_mod=linspace(-Fs/2,Fs/2,length(real(DSBTC_f_demod)));
 plot(f_DSBTC_mod,abs(DSBTC_f_demod));
 title('DSBTC demodulated signal in frequency domain using envelope detector');
