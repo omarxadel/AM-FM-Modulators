@@ -21,7 +21,6 @@ filter = ones(length(FrequencyDomainSignal), 1);
 FilteredSignal_f = filter.*FrequencyDomainSignal;
 
 figure(2);
-subplot(2,1,1);
 f_filtered = linspace(-Fs/2,Fs/2,length(real(FilteredSignal_f)));
 plot(f_filtered, abs(FilteredSignal_f));
 title('Filtered signal in frequency domain');
@@ -29,7 +28,7 @@ title('Filtered signal in frequency domain');
 % 1.3.Filtered signal in time domain.
 FilteredSignal_t = real(ifft(ifftshift(FilteredSignal_f)));
 
-subplot(2,1,2);
+figure(3);
 t = linspace(0,length(FilteredSignal_t)/Fs, length(FilteredSignal_t));
 plot(t, real(FilteredSignal_t));
 title('Filtered signal in time domain');
@@ -50,11 +49,10 @@ carrier_f = fftshift(fft(carrier_t));
 DSBSC_t = carrier_t.*resampledSignal;
 DSBSC_f = fftshift(fft(DSBSC_t));
 
-figure(3);
+figure(4);
 f_DSBSC=linspace(-resampleFrequency/2,resampleFrequency/2,length(real(DSBSC_f)));
 plot(f_DSBSC, abs(DSBSC_f));
 title('DSBSC modulated signal in frequency domain');
-xlim([-2 2]);
 
 signalMax = max(abs(resampledSignal));
 A = 2*signalMax; %because modulation index =0.5
@@ -62,18 +60,17 @@ A = 2*signalMax; %because modulation index =0.5
 DSBTC_t = (A+resampledSignal).*carrier_t;
 DSBTC_f = fftshift(fft(DSBTC_t));
 
-figure(4);
+figure(5);
 f_DSBTC = linspace(-resampleFrequency/2, resampleFrequency/2, length(real(DSBTC_f)));
 plot(f_DSBTC, abs(DSBTC_f));
 title('DSBTC modulated signal in frequency domain');
-xlim([-2 2]);
 
 % 1.6.Envelope detector demodulation.
-[DSBSC_t_demod, DSBSC_f_demod] = envelope_detection(DSBSC_t, fs, resampleFrequency);
-[DSBTC_t_demod, DSBTC_f_demod] = envelope_detection(DSBTC_t, fs, resampleFrequency);
+[DSBSC_t_demod, DSBSC_f_demod] = envelope_detection(DSBSC_t, Fs, resampleFrequency);
+[DSBTC_t_demod, DSBTC_f_demod] = envelope_detection(DSBTC_t, Fs, resampleFrequency);
 
 % 1.7.Sketching and playing the recieved signal.
-figure(5);
+figure(6);
 subplot(2,1,1);
 t_mod = linspace(0, length(DSBSC_t_demod)/Fs, length(DSBSC_t_demod));
 plot(t_mod, real(DSBSC_t_demod));
@@ -83,11 +80,11 @@ subplot(2,1,2);
 f_DSBSC_mod = linspace(-Fs/2, Fs/2, length(real(DSBSC_f_demod)));
 plot(f_DSBSC_mod, abs(DSBSC_f_demod));
 title('DSBSC demodulated signal in frequency domain using envelope detector');
-xlim([-1 1]);
+
 sound(DSBSC_t_demod,Fs);
 pause(8);
 
-figure(6);
+figure(7);
 subplot(2,1,1);
 t_modTc = linspace(0,length(DSBTC_t_demod)/Fs, length(DSBTC_t_demod));
 plot(t_modTc, real(DSBTC_t_demod));
@@ -97,7 +94,7 @@ subplot(2,1,2);
 f_DSBTC_mod = linspace(-Fs/2,Fs/2,length(real(DSBTC_f_demod)));
 plot(f_DSBTC_mod,abs(DSBTC_f_demod));
 title('DSBTC demodulated signal in frequency domain using envelope detector');
-xlim([-1 1]);
+
 sound(DSBTC_t_demod,Fs); 
 pause(8);
 
@@ -106,10 +103,10 @@ snr = 0;
 DSBTC_t_noise = awgn(DSBTC_t, snr);
 [DSBTC_t_demod, DSBTC_f_demod] = envelope_detection(DSBTC_t_noise, Fs, resampleFrequency);
 f_DSBTC_mod = linspace(-Fs/2,Fs/2,length(real(DSBTC_f_demod)));
-figure(7);
+figure(8);
 plot(f_DSBTC_mod,abs(DSBTC_f_demod));
-title('DSBTC demodulated signal in frequency domain using envelope detector');
-% xlim([-1 1]);
+title({'DSBTC demodulated signal in frequency domain' ,'using envelope detector with snr=0'});
+
 sound(DSBTC_t_demod, Fs);
 pause(8);
 
@@ -117,10 +114,10 @@ snr = 10;
 DSBTC_t_noise = awgn(DSBTC_t, snr);
 [DSBTC_t_demod, DSBTC_f_demod] = envelope_detection(DSBTC_t_noise, Fs, resampleFrequency);
 f_DSBTC_mod = linspace(-Fs/2,Fs/2,length(real(DSBTC_f_demod)));
-figure(8);
+figure(9);
 plot(f_DSBTC_mod,abs(DSBTC_f_demod));
-title('DSBTC demodulated signal in frequency domain using envelope detector');
-% xlim([-1 1]);
+title({'DSBTC demodulated signal in frequency domain', 'using envelope detector with snr=10'});
+
 sound(DSBTC_t_demod, Fs);
 pause(8);
 
@@ -128,10 +125,10 @@ snr = 30;
 DSBTC_t_noise = awgn(DSBTC_t, snr);
 [DSBTC_t_demod, DSBTC_f_demod] = envelope_detection(DSBTC_t_noise, Fs, resampleFrequency);
 f_DSBTC_mod = linspace(-Fs/2,Fs/2,length(real(DSBTC_f_demod)));
-figure(9);
+figure(10);
 plot(f_DSBTC_mod,abs(DSBTC_f_demod));
-title('DSBTC demodulated signal in frequency domain using envelope detector');
-% xlim([-0.5 0.5]);
+title({'DSBTC demodulated signal in frequency domain', 'using envelope detector with snr=30'});
+
 sound(DSBTC_t_demod, Fs);
 pause(8);
 
@@ -139,7 +136,7 @@ pause(8);
 [coh_op_t, coh_op_f] = coherent_detection(DSBSC_t, carrier_t, Fs, resampleFrequency, BW);
 
 t_modSc = linspace(0,length(coh_op_t)/Fs, length(coh_op_t));
-figure(10);
+figure(11);
 subplot(2,1,1);
 plot(t_modSc, real(coh_op_t));
 title('DSBSC demodulated signal in time domain using coherent detection');
@@ -156,15 +153,15 @@ DSBSC_t_noise = awgn(DSBSC_t, snr);
 [coh_op_t, coh_op_f] = coherent_detection(DSBSC_t_noise, carrier_t, Fs, resampleFrequency, BW);
 
 t_modSc = linspace(0,length(coh_op_t)/Fs, length(coh_op_t));
-figure(11);
+figure(12);
 subplot(2,1,1);
 plot(t_modSc, real(coh_op_t));
-title('DSBSC demodulated signal in time domain using coherent detection with snr = 0');
+title({'DSBSC demodulated signal in time domain' ,'using coherent detection with snr = 0'});
 
 f_DSBSC_mod = linspace(-Fs/2,Fs/2,length(real(coh_op_f)));
 subplot(2,1,2);
 plot(f_DSBSC_mod, abs(coh_op_f));
-title('DSBSC demodulated signal in frequency domain using coherent detection with snr = 0');
+title({'DSBSC demodulated signal in frequency domain',' using coherent detection with snr = 0'});
 sound(real(coh_op_t), Fs);
 pause(8);
 
@@ -173,15 +170,15 @@ DSBSC_t_noise = awgn(DSBSC_t, snr);
 [coh_op_t, coh_op_f] = coherent_detection(DSBSC_t_noise, carrier_t, Fs, resampleFrequency, BW);
 
 t_modSc = linspace(0,length(coh_op_t)/Fs, length(coh_op_t));
-figure(12);
+figure(13);
 subplot(2,1,1);
 plot(t_modSc, real(coh_op_t));
-title('DSBSC demodulated signal in time domain using coherent detection with snr = 10');
+title({'DSBSC demodulated signal in time domain',' using coherent detection with snr = 10'});
 
 f_DSBSC_mod = linspace(-Fs/2,Fs/2,length(real(coh_op_f)));
 subplot(2,1,2);
 plot(f_DSBSC_mod, abs(coh_op_f));
-title('DSBSC demodulated signal in frequency domain using coherent detection with snr = 10');
+title({'DSBSC demodulated signal in frequency domain',' using coherent detection with snr = 10'});
 sound(real(coh_op_t), Fs);
 pause(8);
 
@@ -190,15 +187,15 @@ DSBSC_t_noise = awgn(DSBSC_t, snr);
 [coh_op_t, coh_op_f] = coherent_detection(DSBSC_t_noise, carrier_t, Fs, resampleFrequency, BW);
 
 t_modSc = linspace(0,length(coh_op_t)/Fs, length(coh_op_t));
-figure(13);
+figure(14);
 subplot(2,1,1);
 plot(t_modSc, real(coh_op_t));
-title('DSBSC demodulated signal in time domain using coherent detection with snr = 30');
+title({'DSBSC demodulated signal in time domain',' using coherent detection with snr = 30'});
 
 f_DSBSC_mod = linspace(-Fs/2,Fs/2,length(real(coh_op_f)));
 subplot(2,1,2);
 plot(f_DSBSC_mod, abs(coh_op_f));
-title('DSBSC demodulated signal in frequency domain using coherent detection with snr = 30');
+title({'DSBSC demodulated signal in frequency domain',' using coherent detection with snr = 30'});
 sound(real(coh_op_t), Fs);
 pause(8);
 
@@ -209,7 +206,7 @@ carrier_error = cos(2*pi*Fc_error*carrierTime).';
 [coh_op_t, coh_op_f] = coherent_detection(DSBSC_t, carrier_error, Fs, resampleFrequency, BW);
 
 t_modSc = linspace(0,length(coh_op_t)/Fs, length(coh_op_t));
-figure(14);
+figure(15);
 subplot(2,1,1);
 plot(t_modSc, real(coh_op_t));
 title('DSBSC demodulated signal in time domain using coherent detection with freq error');
@@ -219,7 +216,7 @@ pause(8);
 f_DSBSC_mod = linspace(-Fs/2,Fs/2,length(real(coh_op_f)));
 subplot(2,1,2);
 plot(f_DSBSC_mod, abs(coh_op_f));
-title('DSBSC demodulated signal in frequency domain using coherent detection with freq error');
+title({'DSBSC demodulated signal in frequency domain',' using coherent detection with freq error'});
 
 % 1.11.Coherent detection of the DSB-SC with phase error.
 carrier_error = cos((2*pi*Fc*carrierTime) + 20).';
@@ -227,14 +224,14 @@ carrier_error = cos((2*pi*Fc*carrierTime) + 20).';
 [coh_op_t, coh_op_f] = coherent_detection(DSBSC_t, carrier_error, Fs, resampleFrequency, BW);
 
 t_modSc = linspace(0,length(coh_op_t)/Fs, length(coh_op_t));
-figure(15);
+figure(16);
 subplot(2,1,1);
 plot(t_modSc, real(coh_op_t));
-title('DSBSC demodulated signal in time domain using coherent detection with phase error');
+title({'DSBSC demodulated signal in time domain using coherent detection',' with phase error'});
 sound(real(coh_op_t), Fs);
 pause(8);
 
 f_DSBSC_mod = linspace(-Fs/2,Fs/2,length(real(coh_op_f)));
 subplot(2,1,2);
 plot(f_DSBSC_mod, abs(coh_op_f));
-title('DSBSC demodulated signal in frequency domain using coherent detection with phase error');
+title({'DSBSC demodulated signal in frequency domain using coherent detection',' with phase error'});
