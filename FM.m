@@ -11,6 +11,8 @@ figure(fig_i);
 fig_i = fig_i + 1;
 plot(f, abs(FrequencyDomainSignal));
 title('Spectrum of the input signal');
+xlabel('Frequency'); 
+ylabel('Value');
 
 % 2.2.Filtering frequencies > 4KHz.
 BW = 4000;
@@ -29,6 +31,8 @@ fig_i = fig_i + 1;
 f_filtered = linspace(-Fs/2,Fs/2,length(real(FilteredSignal_f)));
 plot(f_filtered, abs(FilteredSignal_f));
 title('Filtered signal in frequency domain');
+xlabel('Frequency'); 
+ylabel('Value');
 
 % 2.3.Filtered signal in time domain.
 FilteredSignal_t = real(ifft(ifftshift(FilteredSignal_f)));
@@ -38,6 +42,8 @@ fig_i = fig_i + 1;
 t = linspace(0,length(FilteredSignal_t)/Fs, length(FilteredSignal_t));
 plot(t, real(FilteredSignal_t));
 title('Filtered signal in time domain');
+xlabel('Time'); 
+ylabel('Value');
 
 % 2.4.Playing the filtered audio signal (sound).
 sound(FilteredSignal_t, Fs);
